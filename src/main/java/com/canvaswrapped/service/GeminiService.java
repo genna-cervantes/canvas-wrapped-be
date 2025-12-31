@@ -23,15 +23,18 @@ public class GeminiService {
     public String promptArchetype(String prompt) {
         if (prompt.isBlank()) return "";
         if (!checkPromptStructure(prompt)) return "";
+        Exception err = null;
 
         for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++){
             try{
                 return client.generateText("gemini-2.5-flash", prompt, config);
             }catch(Exception e){
+                err = e;
                 // swallow and retry
-                log.error("e: ", e);
             }
         }
+
+        log.error("e: ", err);
 
 //        TODO log
         return ""; // fails return empty string

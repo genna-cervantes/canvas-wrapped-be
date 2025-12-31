@@ -25,41 +25,46 @@ public class CanvasService {
     }
 
     public ArrayList<Group> requestGroups(String token){
+        Exception err = null;
         for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++){
             try{
                 return apiClient.fetchGroups(token).block();
             }catch(Exception e){
-                log.error("e: ", e);
+                err = e;
                 // swallow and retry
             }
         }
-
+        log.error("e: ", err);
         return new ArrayList<>(List.of());
     }
 
     public ArrayList<Course> requestCourses(String token){
+        Exception err = null;
         for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++){
             try{
                 return apiClient.fetchCourses(token).block();
             }catch(Exception e){
-                log.error("e: ", e);
+                err = e;
                 // swallow and retry
             }
         }
 
+        log.error("e: ", err);
         return new ArrayList<>(List.of());
     }
 
     public CompletableFuture<Mono<ArrayList<Assignment>>> requestAssignments(String token, Long courseId){
         Mono<ArrayList<Assignment>> ass = Mono.just(new ArrayList<>(List.of()));
+        Exception err = null;
         for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++){
             try{
                 ass = apiClient.fetchAssignments(token, courseId);
             }catch(Exception e){
-                log.error("e: ", e);
+                err = e;
                 // swallow and retry
             }
         }
+        log.error("e: ", err);
 
         Mono<ArrayList<Assignment>> finalAss = ass;
         assert ass != null;
