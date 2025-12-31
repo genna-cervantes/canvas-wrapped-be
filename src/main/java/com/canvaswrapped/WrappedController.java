@@ -43,6 +43,9 @@ public class WrappedController {
         ArrayList<Course> courses = canvasService.requestCourses(token);
         ArrayList<Group> groups = canvasService.requestGroups(token);
 
+        System.out.println(courses);
+        System.out.println(groups);
+
         List<CompletableFuture<ArrayList<Assignment>>> futures = courses.stream()
                 .map(course -> canvasService.requestAssignments(token, course.id())
                         .thenCompose(Mono::toFuture))

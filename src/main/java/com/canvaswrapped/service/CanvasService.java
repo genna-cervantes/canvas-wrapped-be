@@ -51,18 +51,18 @@ public class CanvasService {
     }
 
     public CompletableFuture<Mono<ArrayList<Assignment>>> requestAssignments(String token, Long courseId){
-        ArrayList<Assignment> ass = new ArrayList<>(List.of());
+        Mono<ArrayList<Assignment>> ass = Mono.just(new ArrayList<>(List.of()));
         for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++){
             try{
-                ass = apiClient.fetchAssignments(token, courseId).block();
+                ass = apiClient.fetchAssignments(token, courseId);
             }catch(Exception e){
                 log.error("e: ", e);
                 // swallow and retry
             }
         }
 
-        ArrayList<Assignment> finalAss = ass;
+        Mono<ArrayList<Assignment>> finalAss = ass;
         assert ass != null;
-        return CompletableFuture.supplyAsync(() -> Mono.just(finalAss));
+        return CompletableFuture.supplyAsync(() -> finalAss);
     }
 }
