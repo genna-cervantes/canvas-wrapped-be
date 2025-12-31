@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://canvas-wrapped-pi.vercel.app")
 @RequestMapping("api/v1/wrapped")
 public class WrappedController {
 
