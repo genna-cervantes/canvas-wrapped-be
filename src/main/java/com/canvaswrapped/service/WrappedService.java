@@ -193,6 +193,8 @@ public class WrappedService {
         double worstScore = 100;
 
         for (var pair : courseTotals.entrySet()){
+            if (courseMap.get(pair.getKey()) == null) continue;
+
             if (pair.getValue() >= bestScore && courseMap.get(pair.getKey()) != null){
                 if (pair.getValue() == bestScore){
                     if (courseMap.get(pair.getKey()).name().compareTo(courseMap.get(best).name()) < 0){

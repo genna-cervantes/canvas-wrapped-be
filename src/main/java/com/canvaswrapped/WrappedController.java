@@ -4,6 +4,8 @@ import com.canvaswrapped.model.*;
 import com.canvaswrapped.service.CanvasService;
 import com.canvaswrapped.service.GeminiService;
 import com.canvaswrapped.service.WrappedService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 @RequestMapping("api/v1/wrapped")
 public class WrappedController {
 
+    private static final Logger log = LoggerFactory.getLogger(WrappedController.class);
     private final Pattern quizPattern = Pattern.compile("(?i)\\b(quiz|lt|exam|test)\\b");
     private final Pattern attendancePattern = Pattern.compile("(?i)\\b(roll call|attendance|rollcall)\\b");
 
@@ -42,20 +45,22 @@ public class WrappedController {
 
         ArrayList<Course> courses = canvasService.requestCourses(token);
         ArrayList<Group> groups = canvasService.requestGroups(token);
-
-        System.out.println(courses);
-        System.out.println(groups);
-
+        
         List<CompletableFuture<ArrayList<Assignment>>> futures = courses.stream()
                 .map(course -> canvasService.requestAssignments(token, course.id())
                         .thenCompose(Mono::toFuture))
                 .toList();
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
-        ArrayList<Assignment> flattenedAssignments = futures.stream()
-                .map(CompletableFuture::join)
-                .flatMap(List::stream)
-                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Assignment> flattenedAssignments = new ArrayList<>();
+        try{
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            flattenedAssignments = futures.stream()
+                    .map(CompletableFuture::join)
+                    .flatMap(List::stream)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }catch(Exception err){
+            log.error(err.toString());
+        }
 
         ArrayList<Assignment> attendance = new ArrayList<>();
         ArrayList<Assignment> assignments = new ArrayList<>();

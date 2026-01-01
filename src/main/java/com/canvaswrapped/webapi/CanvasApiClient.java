@@ -30,7 +30,8 @@ public class CanvasApiClient implements ApiClient{
                 .headers(h -> h.setBearerAuth(token))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<ArrayList<Group>>() {})
-                .retry(MAX_ATTEMPTS); // retries 2 times after the first failure = 3 attempts total
+                .retry(MAX_ATTEMPTS) // retries 2 times after the first failure = 3 attempts total
+                .onErrorResume(e -> Mono.just(new ArrayList<>()));
     }
 
     @Override
@@ -45,7 +46,8 @@ public class CanvasApiClient implements ApiClient{
                 .headers(h -> h.setBearerAuth(token))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<ArrayList<Course>>() {})
-                .retry(MAX_ATTEMPTS);
+                .retry(MAX_ATTEMPTS)
+                .onErrorResume(e -> Mono.just(new ArrayList<>()));
     }
 
     @Override
@@ -61,6 +63,7 @@ public class CanvasApiClient implements ApiClient{
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<ArrayList<Assignment>>() {})
-                .retry(MAX_ATTEMPTS);
+                .retry(MAX_ATTEMPTS)
+                .onErrorResume(e -> Mono.just(new ArrayList<>()));
     }
 }
